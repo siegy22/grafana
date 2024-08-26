@@ -20,6 +20,7 @@ func TestService_Calculate(t *testing.T) {
 	const (
 		incompatVersion = "4.14.0"
 		compatVersion   = scriptLoadingCreatePluginVersion
+		futureVersion   = "5.0.0"
 	)
 
 	tcs := []struct {
@@ -29,7 +30,7 @@ func TestService_Calculate(t *testing.T) {
 		expected       plugins.LoadingStrategy
 	}{
 		{
-			name: "Expected LoadingStrategyScript when plugin setting cdn_script_loading is true and plugin is not angular",
+			name: "Expected LoadingStrategyScript when create-plugin version is compatible and plugin is not angular",
 			pluginSettings: newPluginSettings(pluginID, map[string]string{
 				createPluginVersionCfgKey: compatVersion,
 			}),
@@ -37,16 +38,23 @@ func TestService_Calculate(t *testing.T) {
 			expected: plugins.LoadingStrategyScript,
 		},
 		{
-			name: "Expected LoadingStrategyScript when plugin setting cdn_script_loading is false, plugin is angular and is not configured as CDN enabled",
+			name: "Expected LoadingStrategyScript when create-plugin version is future compatible and plugin is not angular",
 			pluginSettings: newPluginSettings(pluginID, map[string]string{
-				createPluginVersionCfgKey: incompatVersion,
+				createPluginVersionCfgKey: futureVersion,
+			}),
+			plugin:   newPlugin(pluginID, false),
+			expected: plugins.LoadingStrategyScript,
+		},
+		{
+			name:           "Expected LoadingStrategyScript when create-plugin version is not provided, plugin is not angular and is not configured as CDN enabled",
+			pluginSettings: newPluginSettings(pluginID, map[string]string{
 				// NOTE: cdn key is not set
 			}),
 			plugin:   newPlugin(pluginID, false),
 			expected: plugins.LoadingStrategyScript,
 		},
 		{
-			name: "Expected LoadingStrategyScript when plugin setting cdn_script_loading is false, plugin is not angular, is not configured as CDN enabled and does not have the CDN class",
+			name: "Expected LoadingStrategyScript when create-plugin version is not compatible, plugin is not angular, is not configured as CDN enabled and does not have the CDN class",
 			pluginSettings: newPluginSettings(pluginID, map[string]string{
 				createPluginVersionCfgKey: incompatVersion,
 				// NOTE: cdn key is not set
@@ -58,7 +66,7 @@ func TestService_Calculate(t *testing.T) {
 			expected: plugins.LoadingStrategyScript,
 		},
 		{
-			name: "Expected LoadingStrategyFetch when plugin setting cdn_script_loading is false, plugin is not angular and does not have the CDN class",
+			name: "Expected LoadingStrategyFetch when create-plugin version is not compatible, plugin is not angular, is configured as CDN enabled and does not have the CDN class",
 			pluginSettings: newPluginSettings(pluginID, map[string]string{
 				"cdn":                     "true",
 				createPluginVersionCfgKey: incompatVersion,
@@ -70,7 +78,7 @@ func TestService_Calculate(t *testing.T) {
 			expected: plugins.LoadingStrategyFetch,
 		},
 		{
-			name: "Expected LoadingStrategyFetch when plugin setting cdn_script_loading is false and plugin is angular",
+			name: "Expected LoadingStrategyFetch when create-plugin version is not compatible and plugin is angular",
 			pluginSettings: newPluginSettings(pluginID, map[string]string{
 				createPluginVersionCfgKey: incompatVersion,
 			}),
@@ -78,7 +86,7 @@ func TestService_Calculate(t *testing.T) {
 			expected: plugins.LoadingStrategyFetch,
 		},
 		{
-			name: "Expected LoadingStrategyFetch when plugin setting cdn_script_loading is false, plugin is not angular and plugin is configured as CDN enabled",
+			name: "Expected LoadingStrategyFetch when create-plugin version is not compatible, plugin is not angular and plugin is configured as CDN enabled",
 			pluginSettings: newPluginSettings(pluginID, map[string]string{
 				"cdn":                     "true",
 				createPluginVersionCfgKey: incompatVersion,
@@ -87,7 +95,7 @@ func TestService_Calculate(t *testing.T) {
 			expected: plugins.LoadingStrategyFetch,
 		},
 		{
-			name: "Expected LoadingStrategyFetch when plugin setting cdn_script_loading is false, plugin is not angular and has the CDN class",
+			name: "Expected LoadingStrategyFetch when create-plugin version is not compatible, plugin is not angular and has the CDN class",
 			pluginSettings: newPluginSettings(pluginID, map[string]string{
 				createPluginVersionCfgKey: incompatVersion,
 			}),

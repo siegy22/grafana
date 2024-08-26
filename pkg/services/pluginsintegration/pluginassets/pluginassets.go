@@ -53,9 +53,13 @@ func (s *Service) LoadingStrategy(_ context.Context, p pluginstore.Plugin) plugi
 		}
 	}
 
-	if !s.cdn.PluginSupported(p.ID) && p.Class != plugins.ClassCDN && !p.Angular.Detected {
+	if !s.cndEnabled(p) && !p.Angular.Detected {
 		return plugins.LoadingStrategyScript
 	}
 
 	return plugins.LoadingStrategyFetch
+}
+
+func (s *Service) cndEnabled(p pluginstore.Plugin) bool {
+	return s.cdn.PluginSupported(p.ID) || p.Class == plugins.ClassCDN
 }
